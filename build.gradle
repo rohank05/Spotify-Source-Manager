@@ -7,6 +7,7 @@ plugins {
 
 group 'me.rohank05'
 version '1.0.0'
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
@@ -15,15 +16,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     compileOnly "com.github.walkyst:lavaplayer-fork:fc6b9de7e7"
     api "se.michaelthelin.spotify:spotify-web-api-java:7.0.0"
+    implementation 'org.jsoup:jsoup:1.14.3'
 }
 
-test {
-    useJUnitPlatform()
-}
 
 publishing {
     publications {
