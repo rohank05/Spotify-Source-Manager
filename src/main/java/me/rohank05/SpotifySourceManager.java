@@ -94,7 +94,7 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     public SpotifyTrack getTrack(String id) throws IOException, ParseException, SpotifyWebApiException {
         Track spotifyTrack = this.spotify.getTrack(id).build().execute();
-        AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, spotifyTrack.getUri(), spotifyTrack.getAlbum().getImages()[0].getUrl());
+        AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), spotifyTrack.getAlbum().getImages()[0].getUrl());
         return new SpotifyTrack(audioTrack, spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null), this);
     }
 
@@ -103,7 +103,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         List<AudioTrack> audioTracks = new ArrayList<>();
         TrackSimplified[] spotifyTracks = album.getTracks().getItems();
         for (TrackSimplified spotifyTrack : spotifyTracks) {
-            AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, spotifyTrack.getUri(), album.getImages()[0].getUrl());
+            AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), album.getImages()[0].getUrl());
             audioTracks.add(new SpotifyTrack(audioTrack, null, this));
         }
         return new BasicAudioPlaylist(album.getName(), audioTracks, null, false);
@@ -115,7 +115,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         PlaylistTrack[] playlistTracks = spotifyPlaylist.getTracks().getItems();
         for (PlaylistTrack playlistTrack : playlistTracks) {
             Track spotifyTrack = (Track) playlistTrack.getTrack();
-            AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, spotifyTrack.getUri(), spotifyTrack.getAlbum().getImages()[0].getUrl());
+            AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), spotifyTrack.getAlbum().getImages()[0].getUrl());
             audioTracks.add(new SpotifyTrack(audioTrack, spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null), this));
         }
         return new BasicAudioPlaylist(spotifyPlaylist.getName(), audioTracks, null, false);
