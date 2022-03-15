@@ -2,11 +2,11 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 group 'me.rohank05'
 version '1.0.0'
-sourceCompatibility = 15
 
 repositories {
     mavenCentral()
@@ -23,5 +23,15 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom {
+                from components.java
+            }
+        }
+    }
 }
 compileJava.options.encoding = "UTF-8"
