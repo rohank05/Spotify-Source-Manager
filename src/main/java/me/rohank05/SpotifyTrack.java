@@ -12,10 +12,12 @@ public class SpotifyTrack extends DelegatedAudioTrack {
 
     private final SpotifySourceManager spotifySourceManager;
     private final String isrc;
+    private final String artworkUrl;
     public SpotifyTrack(AudioTrackInfo audioTrackInfo, String isrc, SpotifySourceManager spotifySourceManager){
         super(audioTrackInfo);
         this.spotifySourceManager = spotifySourceManager;
         this.isrc = isrc;
+        this.artworkUrl = audioTrackInfo.artworkUrl;
     }
 
     @Override
@@ -64,4 +66,13 @@ public class SpotifyTrack extends DelegatedAudioTrack {
         completableFuture.join();
         return completableFuture.get();
     }
+
+    public String getIsrc() {
+        return isrc;
+    }
+
+    public String getArtworkUrl() {
+        return artworkUrl;
+    }
+
 }
