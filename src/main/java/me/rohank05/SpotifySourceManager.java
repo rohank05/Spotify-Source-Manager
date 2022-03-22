@@ -26,17 +26,14 @@ import static com.sedmelluq.discord.lavaplayer.tools.DataFormatTools.writeNullab
 public class SpotifySourceManager implements AudioSourceManager {
 
     private final Pattern SPOTIFY_URL_PATTERN = Pattern.compile("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>track|album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)");
-    public static final int MAX_PAGE_ITEMS = 100;
     private static final Logger logger = LoggerFactory.getLogger(SpotifySourceManager.class);
     public SpotifyApi spotify;
-    private final SpotifyConfig config;
     private final ClientCredentialsRequest clientCredentialsRequest;
     private final AudioPlayerManager audioPlayerManager;
 
     public SpotifySourceManager(SpotifyConfig spotifyConfig, AudioPlayerManager audioPlayerManager) {
-        this.config = spotifyConfig;
         this.audioPlayerManager = audioPlayerManager;
-        this.spotify = new SpotifyApi.Builder().setClientId(config.clientId).setClientSecret(config.clientSecret).build();
+        this.spotify = new SpotifyApi.Builder().setClientId(spotifyConfig.clientId).setClientSecret(spotifyConfig.clientSecret).build();
         this.clientCredentialsRequest = this.spotify.clientCredentials().build();
         Thread thread = new Thread(() -> {
             try {
@@ -112,8 +109,8 @@ public class SpotifySourceManager implements AudioSourceManager {
     public AudioItem getPlaylist(String id) throws IOException, ParseException, SpotifyWebApiException {
         Playlist spotifyPlaylist = this.spotify.getPlaylist(id).build().execute();
         List<AudioTrack> audioTracks = new ArrayList<>();
-        PlaylistTrack[] playlistTracks = spotifyPlaylist.getTracks().getItems();
-        for (PlaylistTrack playlistTrack : playlistTracks) {
+        Paging<PlaylistTrack> playlistTracks = this.spotify.getPlaylistsItems(id).build().execute();
+        for (PlaylistTrack playlistTrack : playlistTracks.getItems()) {
             Track spotifyTrack = (Track) playlistTrack.getTrack();
             AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), spotifyTrack.getAlbum().getImages()[0].getUrl());
             audioTracks.add(new SpotifyTrack(audioTrack, spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null), this));
