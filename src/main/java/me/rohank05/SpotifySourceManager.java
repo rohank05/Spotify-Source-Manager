@@ -97,12 +97,16 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     public AudioItem getAlbum(String id) throws IOException, ParseException, SpotifyWebApiException {
         Album album = this.spotify.getAlbum(id).build().execute();
-        List<AudioTrack> audioTracks = new ArrayList<>();
-        TrackSimplified[] spotifyTracks = album.getTracks().getItems();
-        for (TrackSimplified spotifyTrack : spotifyTracks) {
-            AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), album.getImages()[0].getUrl());
-            audioTracks.add(new SpotifyTrack(audioTrack, null, this));
+        ArrayList<AudioTrack> audioTracks = new ArrayList<>();
+        Paging<TrackSimplified> paging = null;
+        do{
+            paging = this.spotify.getAlbumsTracks(id).limit(50).offset(paging == null ? 0 : paging.getOffset() + 50).build().execute();
+            for(var spotifyTrack : paging.getItems()){
+                AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), album.getImages()[0].getUrl());
+                audioTracks.add(new SpotifyTrack(audioTrack, null, this));
+            }
         }
+        while(paging.getNext() != null);
         return new BasicAudioPlaylist(album.getName(), audioTracks, null, false);
     }
 
@@ -117,7 +121,7 @@ public class SpotifySourceManager implements AudioSourceManager {
                 AudioTrackInfo audioTrack = new AudioTrackInfo(spotifyTrack.getName(), spotifyTrack.getArtists()[0].getName(), spotifyTrack.getDurationMs(), spotifyTrack.getId(), false, "https://open.spotify.com/track/" + spotifyTrack.getId(), spotifyTrack.getAlbum().getImages()[0].getUrl());
                 audioTracks.add(new SpotifyTrack(audioTrack, spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null), this));
             }
-        } while(paging.getNext() == null);
+        } while(paging.getNext() != null);
         return new BasicAudioPlaylist(spotifyPlaylist.getName(), audioTracks, null, false);
     }
 
